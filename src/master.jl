@@ -299,6 +299,7 @@ function dmaster_h!(drho, H, J, Jdagger, rates::Nothing, rho, drho_cache)
 end
 
 function dmaster_h!(drho, H, J, Jdagger, rates::AbstractVector, rho, drho_cache)
+    #rho = (rho .+ rho') ./ 2  # protect rho from lossing hermiticity (the error accumulates exponentially)
     QuantumOpticsBase.mul!(drho,H,rho,-eltype(rho)(im),zero(eltype(rho)))
     QuantumOpticsBase.mul!(drho,rho,H,eltype(rho)(im),one(eltype(rho)))
     for i=1:length(J)
@@ -314,6 +315,7 @@ function dmaster_h!(drho, H, J, Jdagger, rates::AbstractVector, rho, drho_cache)
 end
 
 function dmaster_h!(drho, H, J, Jdagger, rates::AbstractMatrix, rho, drho_cache)
+    @show "!"
     QuantumOpticsBase.mul!(drho,H,rho,-eltype(rho)(im),zero(eltype(rho)))
     QuantumOpticsBase.mul!(drho,rho,H,eltype(rho)(im),one(eltype(rho)))
     for j=1:length(J), i=1:length(J)
@@ -342,6 +344,7 @@ See also: [`master`](@ref), [`dmaster_h!`](@ref), [`dmaster_h_dynamic!`](@ref),
 function dmaster_nh!(drho, Hnh, Hnh_dagger, J, Jdagger, rates::Nothing, rho, drho_cache)
     QuantumOpticsBase.mul!(drho,Hnh,rho,-eltype(rho)(im),zero(eltype(rho)))
     QuantumOpticsBase.mul!(drho,rho,Hnh_dagger,eltype(rho)(im),one(eltype(rho)))
+    @show tr(rho)
     for i=1:length(J)
         QuantumOpticsBase.mul!(drho_cache,J[i],rho)
         QuantumOpticsBase.mul!(drho,drho_cache,Jdagger[i],true,true)
